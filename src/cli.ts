@@ -1,5 +1,5 @@
 import { build } from 'gluegun'
-
+export * from './types'
 /**
  * Create the cli and kick it off
  */

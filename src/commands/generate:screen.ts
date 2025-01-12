@@ -3,6 +3,7 @@ import processFolders from '../extensions/processFolder'
 import processFiles from '../extensions/processFile'
 import process = require('process')
 import fs = require('fs')
+import { IStructure } from '../types'
 
 module.exports = {
   name: 'generate:screen',
@@ -19,7 +20,7 @@ module.exports = {
     const userFolderPath = parameters.first
     const screenName = parameters.second
 
-    const structConfigPath = `${process.cwd()}/create_structures/struct.json`
+    const structConfigPath = `${process.cwd()}/create_structures/struct.ts`
 
     if (!fs.existsSync(structConfigPath)) {
       warning(
@@ -28,7 +29,8 @@ module.exports = {
       return
     }
 
-    const structConfig = require(structConfigPath)
+    const structConfig: IStructure =
+      require(structConfigPath) || ({} as IStructure)
 
     if (!userFolderPath) {
       error(

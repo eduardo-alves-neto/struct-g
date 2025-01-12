@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "jsx": "react",
     "allowSyntheticDefaultImports": false,
     "experimentalDecorators": true,
     "lib": [
@@ -16,10 +15,11 @@
     "noImplicitAny": false,
     "noImplicitThis": true,
     "noUnusedLocals": true,
-    // "sourceMap": true,
+    "sourceMap": true,
     // "inlineSourceMap": true,
     "outDir": "build",
-    "strict": false,
+    "esModuleInterop": true,
+    "strict": true,
     "target": "es5",
     "declaration": true,
     "declarationDir": "build/types"

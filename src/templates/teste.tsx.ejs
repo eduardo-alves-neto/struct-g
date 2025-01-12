@@ -1,4 +1,4 @@
-export const ComponentTest = () => {
+export default function Teste() {
   return (
     <>
       <h1>Olá!</h1>
@@ -6,6 +6,7 @@ export const ComponentTest = () => {
         Template gerado automaticamente. Para cada arquivo, criei seu próprio
         template.
       </p>
+      <p>Para usar o nome da sua tela para nomear possíveis variáveis, como: homeRouter, homeServices, utilize a tag <%= props.screenName %> nos templates.</p>
     </>
   )
 }
