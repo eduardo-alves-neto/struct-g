@@ -1,15 +1,14 @@
 import { GluegunToolbox } from 'gluegun'
 import processFolders from '../extensions/processFolder'
 import processFiles from '../extensions/processFile'
-import process = require('process')
 import fs = require('fs')
-import { IStructure } from '../types'
+import path = require('path')
 
-module.exports = {
+export default {
   name: 'generate:screen',
   alias: ['gs'],
   description: 'Create new screen',
-  run: async (toolbox: GluegunToolbox) => {
+  run: async (toolbox: GluegunToolbox): Promise<void> => {
     const {
       print: { success, error, warning },
       filesystem,
@@ -19,18 +18,6 @@ module.exports = {
 
     const userFolderPath = parameters.first
     const screenName = parameters.second
-
-    const structConfigPath = `${process.cwd()}/create_structures/struct.ts`
-
-    if (!fs.existsSync(structConfigPath)) {
-      warning(
-        'arquivo struct.json não encontrado ou aplicação não iniciada(sg init)'
-      )
-      return
-    }
-
-    const structConfig: IStructure =
-      require(structConfigPath) || ({} as IStructure)
 
     if (!userFolderPath) {
       error(
@@ -46,33 +33,55 @@ module.exports = {
       return
     }
 
+    const structConfigPath = path.resolve(
+      process.cwd(),
+      'create_structures/struct.ts'
+    )
     const folderPath = `src/${userFolderPath}/${screenName}`
     filesystem.dir(folderPath)
 
-    for (const item of Object.keys(structConfig)) {
-      const { files, folders: nestedFolders } = structConfig[item]
-      const isRoot = item === 'root'
+    if (fs.existsSync(structConfigPath)) {
+      try {
+        const module = await import(structConfigPath)
+        const structConfig = module.default
 
-      if (files) {
-        await processFiles(
-          files,
-          isRoot ? `${folderPath}` : `${folderPath}/${item}`,
-          screenName,
-          template
-        )
-      }
+        for (const item of Object.keys(structConfig)) {
+          const { files, folders: nestedFolders } = structConfig[item]
+          const isRoot = item === 'root'
 
-      if (nestedFolders) {
-        await processFolders(
-          nestedFolders,
-          isRoot ? `${folderPath}` : `${folderPath}/${item}`,
-          screenName,
-          filesystem,
-          template
+          if (files) {
+            await processFiles(
+              files,
+              isRoot ? `${folderPath}` : `${folderPath}/${item}`,
+              screenName || '',
+              template
+            )
+          }
+
+          if (nestedFolders) {
+            await processFolders(
+              nestedFolders,
+              isRoot ? `${folderPath}` : `${folderPath}/${item}`,
+              screenName || '',
+              filesystem,
+              template
+            )
+          }
+        }
+
+        success(
+          `Tela ${screenName} criada com sucesso em: src/${userFolderPath}!`
         )
+      } catch (erro) {
+        warning('Não foi possível importar o arquivo struct.ts')
+        error(erro)
+        return
       }
+    } else {
+      warning(
+        'arquivo struct.ts não encontrado ou aplicação não iniciada(sg init)'
+      )
+      return
     }
-
-    success(`Tela ${screenName} criada com sucesso em: src/${userFolderPath}!`)
   },
 }

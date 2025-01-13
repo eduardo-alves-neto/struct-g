@@ -20,7 +20,7 @@
     "outDir": "build",
     "esModuleInterop": true,
     "strict": true,
-    "target": "es5",
+    "target": "ES5",
     "declaration": true,
     "declarationDir": "build/types"
   },
